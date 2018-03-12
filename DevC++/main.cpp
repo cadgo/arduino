@@ -1,13 +1,13 @@
 #include <iostream>
 #include <string>
-#define NO_KEY 9
-typedef int byte;
+#define NO_KEY NULL
+typedef unsigned char byte;
 class Serial{
 	public:
 		void println(std::string op1){
 			std::cout << op1 << std::endl;
 		}
-		void println(int x){
+		void println(byte x){
 			std::cout << x << std::endl;
 		}
 }Serial;
@@ -17,8 +17,8 @@ const byte ROWS = 4;
 const byte COLS = 4;
 
 const byte PASSLENGTH = 6;
-const byte PASS1[PASSLENGTH] = {2, 9, 1, 1, 8, 3};
-char CAPTURED[PASSLENGTH];
+const byte PASS1[PASSLENGTH] = {'2', '9', '1', '1', '8', '3'};
+byte CAPTURED[PASSLENGTH];
 const char keys[ROWS][COLS] = {
   {'1', '2', '3', 'A'},
   {'4', '5', '6', 'B'},
@@ -26,14 +26,18 @@ const char keys[ROWS][COLS] = {
   {'*', '0', '#', 'D'}
 };
 
-byte i = 0;
 void AddData(byte data, int pos){
+  Serial.println("Agregando ");
+  std::cout << data << std::endl;
+  //Serial.println(data);
   CAPTURED[pos] = data;
 }
 
 int ComparePass(){
  Serial.println("Comprare pass");
  for (int x=0; x < PASSLENGTH; x++){
+   std::cout << "password " << (byte)PASS1[x] << std::endl;
+   std::cout << "catpurado " << (byte)CAPTURED[x] << std::endl;
    if (CAPTURED[x] != PASS1[x])
      return 0;
  }
@@ -41,28 +45,30 @@ int ComparePass(){
 }
 
 void InitBuffer(){
-  for (int x; x < PASSLENGTH; x++){
-        Serial.println("Informacion del buffer ");
+  for (int x=0; x <= PASSLENGTH; x++){
+        Serial.println("Informacion del buffer \n");
         //Serial.println(CAPTURED[x]); 
-        std::cout << CAPTURED[x];
-        AddData(0, x);
+        std::cout << CAPTURED[x] << std::endl;
+        CAPTURED[x] = 0;
   }
 }
 
+int i = 0;
 void loop(){
 while(1){
-char key =0;
+byte key =0;
   std::cin>>key;
+  std::cout << "indice " << i << std::endl;
   if (key != NO_KEY){
     if (i < PASSLENGTH){
       Serial.println("Agregando Datos al buffer");
-      std::cout << key << std::endl;
-      AddData(key, i);
+      std::cout << (byte)key << std::endl;
+      CAPTURED[i] = key;
     }
     else{
       int comp = ComparePass();
-      Serial.println("Resultado de la comprar");
-      Serial.println(comp);
+      Serial.println("Resultado de la comparacion");
+      std::cout << comp << std::endl;
       if ( comp == 0){
         Serial.println("borrando buffer");
         InitBuffer();
@@ -70,6 +76,7 @@ char key =0;
       }
       else{
         Serial.println("Password correcto");
+        i = 0;
       }
     }
     //else{
