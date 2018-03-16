@@ -8,7 +8,7 @@ class Serial{
 			std::cout << op1 << std::endl;
 		}
 		void println(byte x){
-			std::cout << x << std::endl;
+			std::cout << (byte)x << std::endl;
 		}
 }Serial;
 
@@ -34,10 +34,10 @@ void AddData(byte data, int pos){
 }
 
 int ComparePass(){
- Serial.println("Comprare pass");
+ //Serial.println("Comprare pass");
  for (int x=0; x < PASSLENGTH; x++){
-   std::cout << "password " << (byte)PASS1[x] << std::endl;
-   std::cout << "catpurado " << (byte)CAPTURED[x] << std::endl;
+   //std::cout << "password " << (byte)PASS1[x] << std::endl;
+   //std::cout << "catpurado " << (byte)CAPTURED[x] << std::endl;
    if (CAPTURED[x] != PASS1[x])
      return 0;
  }
@@ -46,37 +46,40 @@ int ComparePass(){
 
 void InitBuffer(){
   for (int x=0; x <= PASSLENGTH; x++){
-        Serial.println("Informacion del buffer \n");
-        //Serial.println(CAPTURED[x]); 
+        //Serial.println("Informacion del buffer \n");
+        //Serial.println(CAPTURED[x]);
         std::cout << CAPTURED[x] << std::endl;
         CAPTURED[x] = 0;
   }
 }
 
-int i = 0;
+int globalCounter = 0;
+int gloCounRes=0;
 void loop(){
 while(1){
 byte key =0;
   std::cin>>key;
-  std::cout << "indice " << i << std::endl;
+  std::cout << "indice " << globalCounter << std::endl;
+  //Serial.println("indice ");
+  //Serial.println(i);
   if (key != NO_KEY){
-    if (i < PASSLENGTH){
+    if (globalCounter < PASSLENGTH){
       Serial.println("Agregando Datos al buffer");
       std::cout << (byte)key << std::endl;
-      CAPTURED[i] = key;
+      CAPTURED[globalCounter] = key;
     }
     else{
       int comp = ComparePass();
       Serial.println("Resultado de la comparacion");
-      std::cout << comp << std::endl;
       if ( comp == 0){
-        Serial.println("borrando buffer");
+        Serial.println("Password Incorrecto");
         InitBuffer();
-        i = 0;
+        gloCounRes = 1;
       }
       else{
         Serial.println("Password correcto");
-        i = 0;
+        InitBuffer();
+        gloCounRes =1;
       }
     }
     //else{
@@ -84,11 +87,16 @@ byte key =0;
     //    InitBuffer();
     //    i = 0;
     //  }
-    i++;
+    if (gloCounRes == 0)
+        globalCounter++;
+    else{
+        globalCounter =0;
+        gloCounRes = 0;
+    }
   }
 }
 }
-  
+
 
 int main(int argc, char** argv) {
 	loop();
